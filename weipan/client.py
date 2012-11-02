@@ -114,7 +114,7 @@ class WeipanClient:
             else:
                 raise e
 
-    def put_file(self, path, file_obj, overwrite = True, parent_rev = None):
+    def put_file(self, path, file_path, overwrite = True, parent_rev = None):
         """
         see: http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#files_put
         """
@@ -127,14 +127,23 @@ class WeipanClient:
         if parent_rev is not None:
             params['parent_rev'] = parent_rev
 
-        return self.put(path, params, file_obj)
+        return self.put(path, params, open(file_path, 'rb'))
 
-    def post_file(self):
+    def post_file(self, path, file_path, overwrite = True, parent_rev = None):
         """
         see: http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#files_post
         todo
         """
-        pass
+        path = "%sfiles/%s%s" % (UPLOAD_URL, self.session.root, format_path(path))
+
+        params = {
+            'overwrite': overwrite and 'true' or 'false'
+        }
+
+        if parent_rev is not None:
+            params['parent_rev'] = parent_rev
+
+        return self.post(request.append_url(path, params), {'@file': file_path})
 
     def metadata(self, path, list=True, hash=None, include_deleted=False):
         """

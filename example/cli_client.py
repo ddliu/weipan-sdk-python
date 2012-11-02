@@ -154,7 +154,7 @@ class WeipanTerm(cmd.Cmd):
         Examples:
         Weipan> put ~/test.txt weipan-copy-test.txt
         """
-        from_file = open(os.path.expanduser(from_path), "rb")
+        from_file = os.path.expanduser(from_path)
 
         self.api_client.put_file(self.current_path + "/" + to_path, from_file)
 

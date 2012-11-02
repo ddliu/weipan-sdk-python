@@ -111,14 +111,21 @@ class TestClient(unittest.TestCase):
     def test_put_file(self):
         self.print_title('test_put_file')
 
-        rst = self.client.put_file(self.remote_dir+'/put_test.txt', open(self.local_txt))
+        rst = self.client.put_file(self.remote_dir+'/put_test.txt', self.local_txt)
+        #print rst
+        self.assert_file(rst)
+
+    def test_post_file(self):
+        self.print_title('test_post_file')
+
+        rst = self.client.post_file(self.remote_dir+'/post_test.txt', self.local_txt)
         #print rst
         self.assert_file(rst)
 
     def test_get_file(self):
         self.print_title('test_get_file')
 
-        self.client.put_file(self.remote_dir+'/get_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir+'/get_test.txt', self.local_txt)
         time.sleep(1)
         rst = self.client.get_file(self.remote_dir+'/get_test.txt')
         self.assertEqual(rst, 'test content')
@@ -126,7 +133,7 @@ class TestClient(unittest.TestCase):
     def test_get_file_url(self):
         self.print_title('test_get_file_url')
 
-        self.client.put_file(self.remote_dir+'/get_file_url_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir+'/get_file_url_test.txt', self.local_txt)
         rst = self.client.get_file_url(self.remote_dir+'/get_file_url_test.txt')
         self.assertEqual(rst[:4], 'http')
 
@@ -141,13 +148,13 @@ class TestClient(unittest.TestCase):
         )
 
         #file
-        rst = self.client.put_file(self.remote_dir+'/metadata_test.txt', open(self.local_txt))
+        rst = self.client.put_file(self.remote_dir+'/metadata_test.txt', self.local_txt)
         self.assert_file(rst)
 
     def test_revisions(self):
         self.print_title('test_revisions')
 
-        self.client.put_file(self.remote_dir+'/revisions_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir+'/revisions_test.txt', self.local_txt)
 
         time.sleep(1)
         
@@ -162,7 +169,7 @@ class TestClient(unittest.TestCase):
         self.print_title('test_revisions')
 
         remote_path = self.remote_dir+'/restore_test.txt'
-        self.client.put_file(remote_path, open(self.local_txt))
+        self.client.put_file(remote_path, self.local_txt)
         rst = self.client.delete(remote_path)
         self.dict_has(rst,
             is_deleted=True
@@ -175,7 +182,7 @@ class TestClient(unittest.TestCase):
 
         self.client.create_folder(self.remote_dir + '/test_search')
         self.client.create_folder(self.remote_dir + '/test_search/hello python')
-        self.client.put_file(self.remote_dir+'/test_search/python_search_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir+'/test_search/python_search_test.txt', self.local_txt)
         rst = self.client.search(self.remote_dir + '/test_search', 'python')
         self.assertIsInstance(rst, list)
         self.assertEqual(len(rst), 2)
@@ -190,7 +197,7 @@ class TestClient(unittest.TestCase):
 
         self.client.create_folder(test_dir)
 
-        self.client.put_file(test_file, open(self.local_txt))
+        self.client.put_file(test_file, self.local_txt)
 
         # share file
         rst = self.client.shares(test_file)
@@ -221,7 +228,7 @@ class TestClient(unittest.TestCase):
     def test_copy_ref(self):
         self.print_title('test_shares')
 
-        self.client.put_file(self.remote_dir + '/copy_ref_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir + '/copy_ref_test.txt', self.local_txt)
         rst = self.client.copy_ref(self.remote_dir + '/copy_ref_test.txt')
         self.dict_has(
             'copy_ref'
@@ -230,7 +237,7 @@ class TestClient(unittest.TestCase):
     def test_media(self):
         self.print_title('test_media')
 
-        self.client.put_file(self.remote_dir + '/media_weipan.png', open(self.local_pic))
+        self.client.put_file(self.remote_dir + '/media_weipan.png', self.local_pic)
 
         time.sleep(1)
 
@@ -248,7 +255,7 @@ class TestClient(unittest.TestCase):
     def test_thumbnails(self):
         self.print_title('test_thumbnails')
 
-        self.client.put_file(self.remote_dir + '/thumbnails_weipan.png', open(self.local_pic))
+        self.client.put_file(self.remote_dir + '/thumbnails_weipan.png', self.local_pic)
 
         time.sleep(1)
 
@@ -261,7 +268,7 @@ class TestClient(unittest.TestCase):
 
         self.client.create_folder(self.remote_dir + '/test_copy')
         self.client.create_folder(self.remote_dir + '/test_copy/dir_a')
-        self.client.put_file(self.remote_dir + '/test_copy/test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir + '/test_copy/test.txt', self.local_txt)
 
         #file copy
         rst = self.client.copy(self.remote_dir + '/test_copy/test.txt', self.remote_dir + '/test_copy/dir_a/copy_test.txt')
@@ -285,7 +292,7 @@ class TestClient(unittest.TestCase):
 
         self.client.create_folder(self.remote_dir + '/test_delete')
 
-        self.client.put_file(self.remote_dir + '/test_delete/delete_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir + '/test_delete/delete_test.txt', self.local_txt)
 
         rst = self.client.delete(self.remote_dir + '/test_delete/delete_test.txt')
         # print rst
@@ -304,7 +311,7 @@ class TestClient(unittest.TestCase):
         self.print_title('test_move')
 
         self.client.create_folder(self.remote_dir + '/test_move')
-        self.client.put_file(self.remote_dir + '/move_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir + '/move_test.txt', self.local_txt)
 
         time.sleep(1)
 
@@ -322,7 +329,7 @@ class TestClient(unittest.TestCase):
     def test_share_media(self):
         self.print_title('test_share_media')
 
-        self.client.put_file(self.remote_dir + 'share_media_test.txt', open(self.local_txt))
+        self.client.put_file(self.remote_dir + 'share_media_test.txt', self.local_txt)
         rst = self.client.copy_ref(self.remote_dir + 'share_media_test.txt')
         rst = self.client.share_media(rst['copy_ref'])
         self.dict_has(rst,

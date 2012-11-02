@@ -42,8 +42,11 @@
     # 创建目录
     api_client.create_folder('/dir1')
 
-    # 上传文件
-    api_client.put_file('/dir1/test.txt', open('path/to/test.txt'))
+    # 上传文件(PUT)
+    api_client.put_file('/dir1/test.txt', 'path/to/test.txt')
+
+    # 上传文件(POST)
+    api_client.post_file('/dir1/test.txt', 'path/to/test.txt')
 
     # 获取信息
     api_client.metadata('/dir1')

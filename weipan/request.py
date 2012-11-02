@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os.path
 import httplib
 import urlparse
 import urllib
 import socket
 import json
+import mimetypes
 
 from .config import *
 
@@ -16,6 +18,35 @@ def append_url(url, params):
     if '?' not in url:
         return url + '?' + params
     return url + '&' + params
+
+def encode_multipart_formdata(fields, files):
+    """
+    fields is a sequence of (name, value) elements for regular form fields.
+    files is a sequence of (name, filename, value) elements for data to be uploaded as files
+    Return (content_type, body) ready for httplib.HTTP instance
+    """
+    BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
+    CRLF = '\r\n'
+    L = []
+    for (key, value) in fields:
+        L.append('--' + BOUNDARY)
+        L.append('Content-Disposition: form-data; name="%s"' % key)
+        L.append('')
+        L.append(value)
+    for (key, filename, value) in files:
+        L.append('--' + BOUNDARY)
+        L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
+        L.append('Content-Type: %s' % get_content_type(filename))
+        L.append('')
+        L.append(value)
+    L.append('--' + BOUNDARY + '--')
+    L.append('')
+    body = CRLF.join(L)
+    content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
+    return content_type, body
+
+def get_content_type(filename):
+    return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
 class RequestObject:
     https_connect = None
@@ -34,8 +65,24 @@ class RequestObject:
         elif method == 'POST' and params:
             if body:
                 raise ValueError("body should not be used with POST params")
-            body = urllib.urlencode(params)
-            headers["Content-type"] = "application/x-www-form-urlencoded"
+            # check file and send with multipart/form-data
+            
+            mf_files = []
+            mf_fields = []
+            for k in params.keys():
+                if k.startswith('@'):
+                    with open(params[k], 'rb') as fh:
+                        file_content = fh.read()
+                    mf_files.append((k[1:], os.path.basename(params[k]), file_content))
+                else:
+                    mf_fields.append((k, params[k]))
+
+            if mf_files:
+                content_type, body = encode_multipart_formdata(mf_fields, mf_files)
+            else:
+                content_type = "application/x-www-form-urlencoded"
+                body = urllib.urlencode(params)
+            headers["Content-type"] = content_type
 
         urlinfo = urlparse.urlparse(url)
         host = urlinfo.hostname
