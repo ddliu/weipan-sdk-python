@@ -24,6 +24,8 @@ def encode_multipart_formdata(fields, files):
     fields is a sequence of (name, value) elements for regular form fields.
     files is a sequence of (name, filename, value) elements for data to be uploaded as files
     Return (content_type, body) ready for httplib.HTTP instance
+    
+    see: http://code.activestate.com/recipes/146306/
     """
     BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
     CRLF = '\r\n'
